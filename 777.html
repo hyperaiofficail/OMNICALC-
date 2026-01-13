@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Style Scientific Calculator</title>
+    <style>
+        /* -----------------------------------------------------------
+           GOOGLE STYLE CSS (Material Design)
+           ----------------------------------------------------------- */
+        :root {
+            --bg-body: #ffffff;
+            --bg-calc: #ffffff;
+            --btn-num-bg: #f1f3f4;
+            --btn-num-text: #202124;
+            --btn-func-bg: #dadce0;
+            --btn-func-text: #202124;
+            --btn-op-bg: #f1f3f4;
+            --btn-op-text: #202124;
+            --btn-equal-bg: #4285f4;
+            --btn-equal-text: #ffffff;
+            --display-text: #202124;
+            --display-sec: #70757a;
+            --border-radius: 4px;
+        }
+
+        /* Dark Mode Colors (Auto-detect preference) */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #202124;
+                --bg-calc: #202124;
+                --btn-num-bg: #303134;
+                --btn-num-text: #e8eaed;
+                --btn-func-bg: #3c4043;
+                --btn-func-text: #e8eaed;
+                --btn-op-bg: #303134;
+                --btn-op-text: #e8eaed;
+                --btn-equal-bg: #8ab4f8;
+                --btn-equal-text: #202124;
+                --display-text: #e8eaed;
+                --display-sec: #9aa0a6;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Roboto', arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--bg-body);
+        }
+
+        .card-frame {
+            width: 100%;
+            max-width: 700px;
+            background: var(--bg-calc);
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+        }
+
+        /* --- DISPLAY SECTION --- */
+        .display-container {
+            width: 100%;
+            padding: 10px 15px 5px 15px;
+            margin-bottom: 10px;
+            text-align: right;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .expression {
+            font-size: 16px;
+            color: var(--display-sec);
+            height: 20px;
+            margin-bottom: 5px;
+        }
+
+        .main-value {
+            font-size: 34px;
+            color: var(--display-text);
+            position: relative;
+            word-wrap: break-word;
+            line-height: 1.2;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 30px;
+            background-color: var(--btn-equal-bg);
+            animation: blink 1s infinite;
+            vertical-align: bottom;
+            margin-left: 2px;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        /* --- BUTTONS LAYOUT --- */
+        .keypad {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        /* Left Side (Scientific) and Right Side (Numpad) */
+        .section-sci, .section-num {
+            display: grid;
+            gap: 6px;
+        }
+
+        /* Desktop Layout: Side by Side */
+        .section-sci {
+            flex: 1;
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .section-num {
+            flex: 1.2;
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        /* Button Styling */
+        button {
+            height: 36px;
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.1s, box-shadow 0.1s;
+            outline: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 600px) {
+            .keypad { flex-direction: column; }
+            .section-sci { grid-template-columns: repeat(6, 1fr); } 
+            button { height: 48px; font-size: 16px; }
+            .card-frame { box-shadow: none; border-radius: 0; height: 100vh; display:flex; flex-direction:column; }
+            .display-container { flex-grow: 1; border: none; display:flex; flex-direction:column; justify-content:flex-end; }
+        }
+
+        /* Button Types Colors */
+        .btn-num { background-color: var(--btn-num-bg); color: var(--btn-num-text); }
+        .btn-sci { background-color: var(--btn-func-bg); color: var(--btn-func-text); font-size: 13px; font-weight: bold;}
+        .btn-op { background-color: var(--btn-op-bg); color: var(--btn-op-text); }
+        .btn-equal { background-color: var(--btn-equal-bg); color: var(--btn-equal-text); }
+
+        /* Hover Effects */
+        button:hover { box-shadow: 0 1px 2px rgba(0,0,0,0.1); filter: brightness(0.95); }
+        button:active { transform: translateY(1px); filter: brightness(0.9); }
+
+        /* Toggle Button (Rad/Deg) */
+        .toggle-btn {
+            font-size: 12px;
+            color: var(--display-sec);
+            font-weight: bold;
+            cursor: pointer;
+            text-align: left;
+            margin-bottom: 5px;
+            display: inline-block;
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+        .active-mode { color: var(--display-text); }
+        .inactive-mode { color: var(--display-sec); opacity: 0.5; }
+
+    </style>
+</head>
+<body>
+
+    <div class="card-frame">
+        
+        <div class="display-container">
+            <div class="toggle-btn" onclick="toggleRadDeg()">
+                <span id="rad-label" class="active-mode">Rad</span> | 
+                <span id="deg-label" class="inactive-mode">Deg</span>
+            </div>
+            <div class="expression" id="prev-display">Ans = 0</div>
+            <div class="main-value">
+                <span id="curr-display">0</span><span class="cursor"></span>
+            </div>
+        </div>
+
+        <div class="keypad">
+            
+            <div class="section-sci">
+                <button class="btn-sci" onclick="setMode('rad')">Rad</button>
+                <button class="btn-sci" onclick="setMode('deg')">Deg</button>
+                <button class="btn-sci" onclick="insertFunc('fact')">x!</button>
+                
+                <button class="btn-sci" onclick="insertFunc('inv')">Inv</button>
+                <button class="btn-sci" onclick="insertFunc('sin')">sin</button>
+                <button class="btn-sci" onclick="insertFunc('ln')">ln</button>
+                
+                <button class="btn-sci" onclick="insertFunc('pi')">π</button>
+                <button class="btn-sci" onclick="insertFunc('cos')">cos</button>
+                <button class="btn-sci" onclick="insertFunc('log')">log</button>
+                
+                <button class="btn-sci" onclick="insertFunc('e')">e</button>
+                <button class="btn-sci" onclick="insertFunc('tan')">tan</button>
+                <button class="btn-sci" onclick="insertFunc('sqrt')">√</button>
+                
+                <button class="btn-sci" onclick="insertText('(')">(</button>
+                <button class="btn-sci" onclick="insertText(')')">)</button>
+                <button class="btn-sci" onclick="insertText('^')">xʸ</button>
+            </div>
+
+            <div class="section-num">
+                <button class="btn-sci" onclick="command('AC')">AC</button>
+                <button class="btn-sci" onclick="command('DEL')">CE</button>
+                <button class="btn-sci" onclick="insertText('%')">%</button>
+                <button class="btn-op" onclick="insertText('/')">÷</button>
+
+                <button class="btn-num" onclick="insertText('7')">7</button>
+                <button class="btn-num" onclick="insertText('8')">8</button>
+                <button class="btn-num" onclick="insertText('9')">9</button>
+                <button class="btn-op" onclick="insertText('*')">×</button>
+
+                <button class="btn-num" onclick="insertText('4')">4</button>
+                <button class="btn-num" onclick="insertText('5')">5</button>
+                <button class="btn-num" onclick="insertText('6')">6</button>
+                <button class="btn-op" onclick="insertText('-')">−</button>
+
+                <button class="btn-num" onclick="insertText('1')">1</button>
+                <button class="btn-num" onclick="insertText('2')">2</button>
+                <button class="btn-num" onclick="insertText('3')">3</button>
+                <button class="btn-op" onclick="insertText('+')">+</button>
+
+                <button class="btn-num" onclick="insertText('0')">0</button>
+                <button class="btn-num" onclick="insertText('.')">.</button>
+                <button class="btn-equal" style="grid-column: span 2" onclick="calculate()">=</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /* -----------------------------------------------------------
+           LOGIC (Advanced Math & State)
+           ----------------------------------------------------------- */
+        let currentExp = "0";
+        let isRadians = true;
+        let lastAns = 0;
+        
+        const display = document.getElementById('curr-display');
+        const prevDisplay = document.getElementById('prev-display');
+        const radLabel = document.getElementById('rad-label');
+        const degLabel = document.getElementById('deg-label');
+
+        function updateScreen() {
+            display.innerText = currentExp;
+        }
+
+        // Toggle Radians / Degrees
+        function toggleRadDeg() {
+            isRadians = !isRadians;
+            updateModeUI();
+        }
+
+        function setMode(mode) {
+            isRadians = (mode === 'rad');
+            updateModeUI();
+        }
+
+        function updateModeUI() {
+            if(isRadians) {
+                radLabel.className = 'active-mode';
+                degLabel.className = 'inactive-mode';
+            } else {
+                radLabel.className = 'inactive-mode';
+                degLabel.className = 'active-mode';
+            }
+        }
+
+        // Insert Numbers or Operators
+        function insertText(val) {
+            if (currentExp === "0" && !isNaN(val)) {
+                currentExp = val;
+            } else if (currentExp === "Error") {
+                currentExp = val;
+            } else {
+                currentExp += val;
+            }
+            updateScreen();
+        }
+
+        // Handle Scientific Functions
+        function insertFunc(fn) {
+            if (currentExp === "0") currentExp = "";
+            
+            switch(fn) {
+                case 'sin': currentExp += "sin("; break;
+                case 'cos': currentExp += "cos("; break;
+                case 'tan': currentExp += "tan("; break;
+                case 'ln': currentExp += "ln("; break;
+                case 'log': currentExp += "log("; break;
+                case 'sqrt': currentExp += "√("; break;
+                case 'pi': currentExp += "π"; break;
+                case 'e': currentExp += "e"; break;
+                case 'fact': currentExp += "!"; break;
+                case 'inv': 
+                    // Simple visual cue, expands to inverse in real app
+                    currentExp += "asin("; 
+                    break;
+            }
+            updateScreen();
+        }
+
+        // Commands (AC, DEL)
+        function command(cmd) {
+            if (cmd === 'AC') {
+                currentExp = "0";
+                prevDisplay.innerText = "Ans = " + lastAns;
+            } else if (cmd === 'DEL') {
+                if (currentExp.length > 1) {
+                    currentExp = currentExp.slice(0, -1);
+                } else {
+                    currentExp = "0";
+                }
+            }
+            updateScreen();
+        }
+
+        // --- THE BRAIN (Calculation Engine) ---
+        function calculate() {
+            let raw = currentExp;
+            
+            // 1. Replace Visual Symbols with JS Math
+            // Handle Factorial (!) manually first as it's not standard JS
+            raw = handleFactorial(raw);
+
+            // Replace Constants
+            raw = raw.replace(/π/g, 'Math.PI');
+            raw = raw.replace(/e/g, 'Math.E');
+            
+            // Replace Operators
+            raw = raw.replace(/×/g, '*').replace(/÷/g, '/').replace(/\^/g, '**');
+            
+            // Replace Functions
+            // Note: We need a regex to capture the number inside for Deg/Rad conversion
+            raw = raw.replace(/√/g, 'Math.sqrt');
+            raw = raw.replace(/ln/g, 'Math.log');
+            raw = raw.replace(/log/g, 'Math.log10');
+
+            // Trig Functions with Mode Check
+            // We wrap arguments in a helper function to convert deg->rad if needed
+            raw = raw.replace(/sin\(/g, `trig('sin',`);
+            raw = raw.replace(/cos\(/g, `trig('cos',`);
+            raw = raw.replace(/tan\(/g, `trig('tan',`);
+            raw = raw.replace(/asin\(/g, `trig('asin',`);
+
+            try {
+                // Safe Evaluation
+                let result = new Function('return ' + raw)();
+                
+                // Formatting
+                if (!isFinite(result) || isNaN(result)) {
+                    currentExp = "Error";
+                } else {
+                    // Precision handling for float errors (like 0.1+0.2)
+                    let precision = 10000000000;
+                    result = Math.round(result * precision) / precision;
+                    
+                    lastAns = result;
+                    prevDisplay.innerText = currentExp + " =";
+                    currentExp = result.toString();
+                }
+            } catch (e) {
+                console.error(e);
+                currentExp = "Error";
+            }
+            updateScreen();
+        }
+
+        // Helper for Trigonometry
+        window.trig = function(type, val) {
+            if (!isRadians && (type === 'sin' || type === 'cos' || type === 'tan')) {
+                val = val * (Math.PI / 180);
+            }
+            return Math[type](val);
+        };
+
+        // Helper for Factorial
+        function handleFactorial(str) {
+            // Finds number followed by !, e.g., 5!
+            return str.replace(/(\d+)!/g, function(match, number) {
+                let n = parseInt(number);
+                let result = 1;
+                for(let i = 2; i <= n; i++) result *= i;
+                return result;
+            });
+        }
+
+        // Keyboard Support
+        document.addEventListener('keydown', (e) => {
+            if((e.key >= 0 && e.key <= 9) || e.key === '.') insertText(e.key);
+            if(e.key === 'Enter') calculate();
+            if(e.key === 'Backspace') command('DEL');
+            if(e.key === 'Escape') command('AC');
+            if(['+','-','*','/','(',')','^'].includes(e.key)) insertText(e.key);
+        });
+
+    </script>
+</body>
+</html>
