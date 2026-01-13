@@ -1,0 +1,38 @@
+:root {
+    --bg-body: #ffffff;
+    --bg-calc: #ffffff;
+    --btn-num-bg: #f1f3f4;
+    --btn-num-text: #202124;
+    --btn-func-bg: #dadce0;
+    --btn-func-text: #202124;
+    --btn-op-bg: #f1f3f4;
+    --btn-op-text: #202124;
+    --btn-equal-bg: #4285f4;
+    --btn-equal-text: #ffffff;
+    --display-text: #202124;
+    --display-sec: #70757a;
+    --border-radius: 4px;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-body: #202124;
+        --bg-calc: #202124;
+        --btn-num-bg: #303134;
+        --btn-num-text: #e8eaed;
+        --btn-func-bg: #3c4043;
+        --btn-func-text: #e8eaed;
+        --btn-op-bg: #303134;
+        --btn-op-text: #e8eaed;
+        --btn-equal-bg: #8ab4f8;
+        --btn-equal-text: #202124;
+        --display-text: #e8eaed;
+        --display-sec: #9aa0a6;
+    }
+}
+
+* {
+    box-sizing: border-box;
+    font-family: Roboto, Arial, sans-serif;
+}
