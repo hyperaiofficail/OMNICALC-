@@ -396,9 +396,10 @@
         };
 
         // Helper for Factorial
+        const FACTORIAL_REGEX = /(\d+)!/g;
         function handleFactorial(str) {
             // Finds number followed by !, e.g., 5!
-            return str.replace(/(\d+)!/g, function(match, number) {
+            return str.replace(FACTORIAL_REGEX, function(match, number) {
                 let n = parseInt(number);
                 let result = 1;
                 for(let i = 2; i <= n; i++) result *= i;
