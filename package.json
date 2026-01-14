@@ -1,0 +1,25 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "The best ai integrated calculator",
+  "main": "Script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperaiofficail/OMNICALC-.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/hyperaiofficail/OMNICALC-/issues"
+  },
+  "homepage": "https://github.com/hyperaiofficail/OMNICALC-#readme",
+  "dependencies": {
+    "jest": "^30.2.0",
+    "mathjs": "^15.1.0"
+  }
+}

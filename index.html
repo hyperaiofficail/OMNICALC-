@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniCalc AI Platform</title>
+    <link rel="stylesheet" href="./src/ui/style.css">
+    <style>
+        /* Additional styles for AI features */
+        .ai-input-container {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        #ai-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #dfe1e5;
+            border-radius: 24px;
+            font-size: 16px;
+            outline: none;
+            transition: box-shadow 0.2s;
+        }
+        #ai-input:focus {
+            box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+        }
+        .meta-info {
+            font-size: 12px;
+            color: #70757a;
+            margin-top: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .loading {
+            color: #4285f4;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card-frame">
+        <div class="ai-input-container">
+            <input type="text" id="ai-input" placeholder="Ask anything (e.g., 'BMI for 70kg 1.75m')...">
+        </div>
+
+        <div class="display-container">
+            <div class="toggle-btn" id="rad-deg-toggle">
+                <span id="rad-label" class="active-mode">Rad</span> |
+                <span id="deg-label" class="inactive-mode">Deg</span>
+            </div>
+            <div class="expression" id="prev-display">Ans = 0</div>
+            <div class="main-value">
+                <span id="curr-display">0</span><span class="cursor"></span>
+            </div>
+            <div class="meta-info">
+                <span id="calc-source">Calculator: Basic</span>
+                <span id="perf-metrics">Latency: 0ms</span>
+            </div>
+        </div>
+
+        <div class="keypad">
+
+            <div class="section-sci">
+                <button class="btn-sci" data-action="mode" data-value="rad">Rad</button>
+                <button class="btn-sci" data-action="mode" data-value="deg">Deg</button>
+                <button class="btn-sci" data-action="func" data-value="!">x!</button>
+
+                <button class="btn-sci" data-action="func" data-value="inv">Inv</button>
+                <button class="btn-sci" data-action="func" data-value="sin">sin</button>
+                <button class="btn-sci" data-action="func" data-value="ln">ln</button>
+
+                <button class="btn-sci" data-action="const" data-value="pi">π</button>
+                <button class="btn-sci" data-action="func" data-value="cos">cos</button>
+                <button class="btn-sci" data-action="func" data-value="log">log</button>
+
+                <button class="btn-sci" data-action="const" data-value="e">e</button>
+                <button class="btn-sci" data-action="func" data-value="tan">tan</button>
+                <button class="btn-sci" data-action="func" data-value="sqrt">√</button>
+
+                <button class="btn-sci" data-action="insert" data-value="(">(</button>
+                <button class="btn-sci" data-action="insert" data-value=")">)</button>
+                <button class="btn-sci" data-action="insert" data-value="^">xʸ</button>
+            </div>
+
+            <div class="section-num">
+                <button class="btn-sci" data-action="command" data-value="AC">AC</button>
+                <button class="btn-sci" data-action="command" data-value="DEL">CE</button>
+                <button class="btn-sci" data-action="insert" data-value="%">%</button>
+                <button class="btn-op" data-action="insert" data-value="/">÷</button>
+
+                <button class="btn-num" data-action="insert" data-value="7">7</button>
+                <button class="btn-num" data-action="insert" data-value="8">8</button>
+                <button class="btn-num" data-action="insert" data-value="9">9</button>
+                <button class="btn-op" data-action="insert" data-value="*">×</button>
+
+                <button class="btn-num" data-action="insert" data-value="4">4</button>
+                <button class="btn-num" data-action="insert" data-value="5">5</button>
+                <button class="btn-num" data-action="insert" data-value="6">6</button>
+                <button class="btn-op" data-action="insert" data-value="-">−</button>
+
+                <button class="btn-num" data-action="insert" data-value="1">1</button>
+                <button class="btn-num" data-action="insert" data-value="2">2</button>
+                <button class="btn-num" data-action="insert" data-value="3">3</button>
+                <button class="btn-op" data-action="insert" data-value="+">+</button>
+
+                <button class="btn-num" data-action="insert" data-value="0">0</button>
+                <button class="btn-num" data-action="insert" data-value=".">.</button>
+                <button class="btn-equal" style="grid-column: span 2" data-action="calculate">=</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Main Entry Point -->
+    <script src="./src/ui/libs/math.js"></script>
+    <script type="module" src="./src/ui/App.js"></script>
+</body>
+</html>
