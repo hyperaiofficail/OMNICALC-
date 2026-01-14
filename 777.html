@@ -148,7 +148,7 @@
         /* Mobile Responsive */
         @media (max-width: 600px) {
             .keypad { flex-direction: column; }
-            .section-sci { grid-template-columns: repeat(6, 1fr); } 
+            .section-sci { grid-template-columns: repeat(6, 1fr); }
             button { height: 48px; font-size: 16px; }
             .card-frame { box-shadow: none; border-radius: 0; height: 100vh; display:flex; flex-direction:column; }
             .display-container { flex-grow: 1; border: none; display:flex; flex-direction:column; justify-content:flex-end; }
@@ -184,10 +184,10 @@
 <body>
 
     <div class="card-frame">
-        
+
         <div class="display-container">
             <div class="toggle-btn" onclick="toggleRadDeg()">
-                <span id="rad-label" class="active-mode">Rad</span> | 
+                <span id="rad-label" class="active-mode">Rad</span> |
                 <span id="deg-label" class="inactive-mode">Deg</span>
             </div>
             <div class="expression" id="prev-display">Ans = 0</div>
@@ -197,32 +197,32 @@
         </div>
 
         <div class="keypad">
-            
+
             <div class="section-sci">
                 <button class="btn-sci" onclick="setMode('rad')">Rad</button>
                 <button class="btn-sci" onclick="setMode('deg')">Deg</button>
                 <button class="btn-sci" onclick="insertFunc('fact')">x!</button>
-                
+
                 <button class="btn-sci" onclick="insertFunc('inv')">Inv</button>
                 <button class="btn-sci" onclick="insertFunc('sin')">sin</button>
                 <button class="btn-sci" onclick="insertFunc('ln')">ln</button>
-                
+
                 <button class="btn-sci" onclick="insertFunc('pi')">π</button>
                 <button class="btn-sci" onclick="insertFunc('cos')">cos</button>
                 <button class="btn-sci" onclick="insertFunc('log')">log</button>
-                
+
                 <button class="btn-sci" onclick="insertFunc('e')">e</button>
                 <button class="btn-sci" onclick="insertFunc('tan')">tan</button>
                 <button class="btn-sci" onclick="insertFunc('sqrt')">√</button>
-                
+
                 <button class="btn-sci" onclick="insertText('(')">(</button>
                 <button class="btn-sci" onclick="insertText(')')">)</button>
                 <button class="btn-sci" onclick="insertText('^')">xʸ</button>
             </div>
 
             <div class="section-num">
-                <button class="btn-sci" onclick="command('AC')">AC</button>
-                <button class="btn-sci" onclick="command('DEL')">CE</button>
+                <button class="btn-sci" onclick="runCommand('AC')">AC</button>
+                <button class="btn-sci" onclick="runCommand('DEL')">CE</button>
                 <button class="btn-sci" onclick="insertText('%')">%</button>
                 <button class="btn-op" onclick="insertText('/')">÷</button>
 
@@ -256,7 +256,7 @@
         let currentExp = "0";
         let isRadians = true;
         let lastAns = 0;
-        
+
         const display = document.getElementById('curr-display');
         const prevDisplay = document.getElementById('prev-display');
         const radLabel = document.getElementById('rad-label');
@@ -302,7 +302,7 @@
         // Handle Scientific Functions
         function insertFunc(fn) {
             if (currentExp === "0") currentExp = "";
-            
+
             switch(fn) {
                 case 'sin': currentExp += "sin("; break;
                 case 'cos': currentExp += "cos("; break;
@@ -313,16 +313,16 @@
                 case 'pi': currentExp += "π"; break;
                 case 'e': currentExp += "e"; break;
                 case 'fact': currentExp += "!"; break;
-                case 'inv': 
+                case 'inv':
                     // Simple visual cue, expands to inverse in real app
-                    currentExp += "asin("; 
+                    currentExp += "asin(";
                     break;
             }
             updateScreen();
         }
 
         // Commands (AC, DEL)
-        function command(cmd) {
+        function runCommand(cmd) {
             if (cmd === 'AC') {
                 currentExp = "0";
                 prevDisplay.innerText = "Ans = " + lastAns;
@@ -337,49 +337,187 @@
         }
 
         // --- THE BRAIN (Calculation Engine) ---
+        const Precedence = {
+            '+': 2, '-': 2,
+            '*': 3, '/': 3, '%': 3,
+            '^': 4,
+            '!': 5,
+            'u-': 6
+        };
+
+        const Associativity = {
+            '+': 'L', '-': 'L',
+            '*': 'L', '/': 'L', '%': 'L',
+            '^': 'R',
+            '!': 'L',
+            'u-': 'R'
+        };
+
+        function factorial(n) {
+            if (n < 0) return NaN;
+            let res = 1;
+            for (let i = 2; i <= n; i++) res *= i;
+            return res;
+        }
+
         function calculate() {
             let raw = currentExp;
-            
-            // 1. Replace Visual Symbols with JS Math
-            // Handle Factorial (!) manually first as it's not standard JS
-            raw = handleFactorial(raw);
 
-            // Replace Constants
-            raw = raw.replace(/π/g, 'Math.PI');
-            raw = raw.replace(/e/g, 'Math.E');
-            
-            // Replace Operators
-            raw = raw.replace(/×/g, '*').replace(/÷/g, '/').replace(/\^/g, '**');
-            
-            // Replace Functions
-            // Note: We need a regex to capture the number inside for Deg/Rad conversion
-            raw = raw.replace(/√/g, 'Math.sqrt');
-            raw = raw.replace(/ln/g, 'Math.log');
-            raw = raw.replace(/log/g, 'Math.log10');
+            // 1. Preprocess
+            raw = raw.replace(/×/g, '*').replace(/÷/g, '/').replace(/\^/g, '^');
+            raw = raw.replace(/π/g, 'PI').replace(/e/g, 'E');
+            raw = raw.replace(/√/g, 'sqrt');
 
-            // Trig Functions with Mode Check
-            // We wrap arguments in a helper function to convert deg->rad if needed
-            raw = raw.replace(/sin\(/g, `trig('sin',`);
-            raw = raw.replace(/cos\(/g, `trig('cos',`);
-            raw = raw.replace(/tan\(/g, `trig('tan',`);
-            raw = raw.replace(/asin\(/g, `trig('asin',`);
+            // 2. Tokenize
+            const tokens = [];
+            const pattern = /(\d+(?:\.\d+)?|\.\d+)|(asin|acos|atan|sin|cos|tan|ln|log|sqrt|PI|E)|([+/*\-^%!()])|(\S)/g;
+
+            let match;
+            let lastType = 'START';
+            let lastOp = null;
 
             try {
-                // Safe Evaluation
-                let result = new Function('return ' + raw)();
-                
-                // Formatting
+                while ((match = pattern.exec(raw)) !== null) {
+                    if (match[1]) { // Number
+                        tokens.push({ type: 'NUMBER', value: parseFloat(match[1]) });
+                        lastType = 'NUMBER';
+                    } else if (match[2]) { // Function or Constant
+                        if (['PI', 'E'].includes(match[2])) {
+                            tokens.push({ type: 'CONSTANT', value: match[2] });
+                            lastType = 'NUMBER';
+                        } else {
+                            tokens.push({ type: 'FUNCTION', value: match[2] });
+                            lastType = 'FUNCTION';
+                        }
+                    } else if (match[3]) { // Operator or Paren
+                        const op = match[3];
+                        if (op === '(') {
+                            tokens.push({ type: 'LPAREN' });
+                            lastType = 'LPAREN';
+                        } else if (op === ')') {
+                            tokens.push({ type: 'RPAREN' });
+                            lastType = 'RPAREN';
+                        } else if (op === '-') {
+                            if (lastType === 'START' || lastType === 'LPAREN' || (lastType === 'OPERATOR' && lastOp !== '!')) {
+                                tokens.push({ type: 'OPERATOR', value: 'u-' });
+                            } else {
+                                tokens.push({ type: 'OPERATOR', value: '-' });
+                            }
+                            lastType = 'OPERATOR';
+                            lastOp = op;
+                        } else {
+                            tokens.push({ type: 'OPERATOR', value: op });
+                            lastType = 'OPERATOR';
+                            lastOp = op;
+                        }
+                    } else if (match[4]) {
+                        if (match[4].trim() === '') continue;
+                        throw new Error("Unknown char");
+                    }
+                }
+
+                // 3. Shunting Yard
+                const output = [];
+                const stack = [];
+
+                for (const token of tokens) {
+                    if (token.type === 'NUMBER' || token.type === 'CONSTANT') {
+                        output.push(token);
+                    } else if (token.type === 'FUNCTION') {
+                        stack.push(token);
+                    } else if (token.type === 'LPAREN') {
+                        stack.push(token);
+                    } else if (token.type === 'RPAREN') {
+                        while (stack.length > 0 && stack[stack.length - 1].type !== 'LPAREN') {
+                            output.push(stack.pop());
+                        }
+                        if (stack.length === 0) throw new Error("Mismatched parens");
+                        stack.pop();
+                        if (stack.length > 0 && stack[stack.length - 1].type === 'FUNCTION') {
+                            output.push(stack.pop());
+                        }
+                    } else if (token.type === 'OPERATOR') {
+                         while (stack.length > 0) {
+                             const top = stack[stack.length - 1];
+                             if (top.type === 'LPAREN') break;
+
+                             const p1 = Precedence[token.value] || 0;
+                             const p2 = Precedence[top.value] || 0;
+
+                             if ((Associativity[token.value] === 'L' && p1 <= p2) ||
+                                 (Associativity[token.value] === 'R' && p1 < p2)) {
+                                 output.push(stack.pop());
+                             } else {
+                                 break;
+                             }
+                         }
+                         stack.push(token);
+                    }
+                }
+                while (stack.length > 0) {
+                    if (stack[stack.length - 1].type === 'LPAREN') throw new Error("Mismatched parens");
+                    output.push(stack.pop());
+                }
+
+                // 4. Evaluate RPN
+                const evalStack = [];
+                for (const token of output) {
+                    if (token.type === 'NUMBER') {
+                        evalStack.push(token.value);
+                    } else if (token.type === 'CONSTANT') {
+                        if (token.value === 'PI') evalStack.push(Math.PI);
+                        else if (token.value === 'E') evalStack.push(Math.E);
+                    } else if (token.type === 'OPERATOR') {
+                        if (token.value === 'u-') {
+                            if (evalStack.length < 1) throw new Error();
+                            const a = evalStack.pop();
+                            evalStack.push(-a);
+                        } else if (token.value === '!') {
+                            if (evalStack.length < 1) throw new Error();
+                            const a = evalStack.pop();
+                            evalStack.push(factorial(a));
+                        } else {
+                            if (evalStack.length < 2) throw new Error();
+                            const b = evalStack.pop();
+                            const a = evalStack.pop();
+                            switch (token.value) {
+                                case '+': evalStack.push(a + b); break;
+                                case '-': evalStack.push(a - b); break;
+                                case '*': evalStack.push(a * b); break;
+                                case '/': evalStack.push(a / b); break;
+                                case '%': evalStack.push(a % b); break;
+                                case '^': evalStack.push(Math.pow(a, b)); break;
+                            }
+                        }
+                    } else if (token.type === 'FUNCTION') {
+                         if (evalStack.length < 1) throw new Error();
+                         const arg = evalStack.pop();
+                         if (['sin', 'cos', 'tan', 'asin', 'acos', 'atan'].includes(token.value)) {
+                             evalStack.push(trig(token.value, arg));
+                         } else {
+                             switch (token.value) {
+                                 case 'sqrt': evalStack.push(Math.sqrt(arg)); break;
+                                 case 'ln': evalStack.push(Math.log(arg)); break;
+                                 case 'log': evalStack.push(Math.log10(arg)); break;
+                             }
+                         }
+                    }
+                }
+
+                if (evalStack.length !== 1) throw new Error();
+                let result = evalStack[0];
+
                 if (!isFinite(result) || isNaN(result)) {
                     currentExp = "Error";
                 } else {
-                    // Precision handling for float errors (like 0.1+0.2)
                     let precision = 10000000000;
                     result = Math.round(result * precision) / precision;
-                    
+
                     lastAns = result;
                     prevDisplay.innerText = currentExp + " =";
                     currentExp = result.toString();
                 }
+
             } catch (e) {
                 console.error(e);
                 currentExp = "Error";
@@ -395,23 +533,12 @@
             return Math[type](val);
         };
 
-        // Helper for Factorial
-        function handleFactorial(str) {
-            // Finds number followed by !, e.g., 5!
-            return str.replace(/(\d+)!/g, function(match, number) {
-                let n = parseInt(number);
-                let result = 1;
-                for(let i = 2; i <= n; i++) result *= i;
-                return result;
-            });
-        }
-
         // Keyboard Support
         document.addEventListener('keydown', (e) => {
             if((e.key >= 0 && e.key <= 9) || e.key === '.') insertText(e.key);
             if(e.key === 'Enter') calculate();
-            if(e.key === 'Backspace') command('DEL');
-            if(e.key === 'Escape') command('AC');
+            if(e.key === 'Backspace') runCommand('DEL');
+            if(e.key === 'Escape') runCommand('AC');
             if(['+','-','*','/','(',')','^'].includes(e.key)) insertText(e.key);
         });
 
