@@ -45,7 +45,7 @@ function App() {
            {!activeCalculatorId ? (
              <div className="flex-1 flex flex-col items-center justify-center animate-fade-in">
                 <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-red-400 bg-clip-text text-transparent mb-6 tracking-tight">
-                  OmniCalc AI
+                  Best.ai Calculator
                 </h1>
                 <p className="text-gray-400 mb-8 text-lg">
                   What would you like to calculate today?

@@ -7,7 +7,7 @@ export const Sidebar = ({ isOpen, toggle, onSelect, activeId }) => {
   return (
     <div className={`${isOpen ? 'w-64' : 'w-0'} bg-gemini-surface border-r border-white/5 transition-all duration-300 flex flex-col overflow-hidden whitespace-nowrap relative`}>
       <div className="p-4 border-b border-white/5 flex justify-between items-center min-w-[256px]">
-        <span className="font-bold text-lg bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">OmniCalc</span>
+        <span className="font-bold text-lg bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Best.ai</span>
         <button onClick={toggle} className="text-gray-400 hover:text-white p-1 rounded hover:bg-white/10">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         </button>
