@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniCalc AI</title>
+    <link rel="stylesheet" href="src/styles/gemini.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header / Nav (Minimal) -->
+        <header class="app-header">
+            <div class="logo">OmniCalc <span class="ai-badge">AI</span></div>
+            <div class="theme-toggle" id="theme-toggle">
+                <!-- Icon placeholder -->
+                ◑
+            </div>
+        </header>
+
+        <!-- Main Scrollable Area -->
+        <main class="chat-stream" id="chat-stream">
+            <div class="welcome-message">
+                <h1>How can I help you calculate today?</h1>
+                <p>Ask anything from basic math to complex engineering formulas.</p>
+                <div class="suggestion-chips">
+                    <button class="chip" onclick="setInput('Calculate mortgage for $500k at 5.5%')">Mortgage</button>
+                    <button class="chip" onclick="setInput('sin(45 deg) + cos(45 deg)')">Trigonometry</button>
+                    <button class="chip" onclick="setInput('Convert 100 USD to EUR')">Currency</button>
+                    <button class="chip" onclick="setInput('Solve 2x + 5 = 15')">Algebra</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Input Area (Sticky Bottom) -->
+        <footer class="input-area">
+            <div class="input-wrapper">
+                <textarea id="user-input" placeholder="Type a formula, question, or command..." rows="1"></textarea>
+                <button id="send-btn" aria-label="Calculate">
+                    ➤
+                </button>
+            </div>
+            <div class="disclaimer">
+                OmniCalc AI • Precision Engine v1.0
+            </div>
+        </footer>
+    </div>
+
+    <script type="module" src="src/main.js"></script>
+    <script>
+        function setInput(text) {
+            const input = document.getElementById('user-input');
+            input.value = text;
+            input.focus();
+        }
+    </script>
+</body>
+</html>
