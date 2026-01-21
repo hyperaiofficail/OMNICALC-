@@ -1,0 +1,292 @@
+/* =========================================================
+   GOOGLE-STYLE SEARCH PAGE CSS (google.com–like UI)
+   Pure CSS – usable for search homepage + results page
+========================================================= */
+
+/* -------------------- ROOT -------------------- */
+:root {
+  --bg: #ffffff;
+  --text-main: #202124;
+  --text-muted: #5f6368;
+  --link: #1a0dab;
+  --link-visited: #681da8;
+  --border: #dadce0;
+  --hover-bg: #f1f3f4;
+  --btn-bg: #f8f9fa;
+  --btn-hover: #f1f3f4;
+  --shadow: 0 1px 6px rgba(32,33,36,.28);
+  --radius: 24px;
+  --font: Arial, Helvetica, sans-serif;
+}
+
+/* -------------------- RESET -------------------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 14px;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text-main);
+}
+
+/* -------------------- HEADER -------------------- */
+.header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 12px 20px;
+  gap: 16px;
+}
+
+.header a {
+  color: var(--text-main);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.header a:hover {
+  text-decoration: underline;
+}
+
+.header .apps {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.header .apps:hover {
+  background: var(--hover-bg);
+}
+
+/* -------------------- LOGO -------------------- */
+.logo {
+  margin-top: 140px;
+  text-align: center;
+}
+
+.logo img {
+  width: 272px;
+}
+
+/* -------------------- SEARCH BOX -------------------- */
+.search-area {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.search-box {
+  width: 580px;
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 16px;
+  transition: box-shadow .2s, border .2s;
+}
+
+.search-box:hover,
+.search-box:focus-within {
+  box-shadow: var(--shadow);
+  border-color: transparent;
+}
+
+.search-box input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  margin-left: 12px;
+}
+
+.search-icon,
+.mic-icon,
+.cam-icon {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+/* -------------------- BUTTONS -------------------- */
+.search-buttons {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.search-buttons button {
+  background: var(--btn-bg);
+  border: 1px solid var(--btn-bg);
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.search-buttons button:hover {
+  border: 1px solid var(--border);
+  background: var(--btn-hover);
+}
+
+/* -------------------- LANGUAGE -------------------- */
+.language {
+  margin-top: 30px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.language a {
+  color: var(--link);
+  text-decoration: none;
+  margin: 0 4px;
+}
+
+.language a:hover {
+  text-decoration: underline;
+}
+
+/* ==================================================
+   SEARCH RESULTS PAGE
+================================================== */
+
+/* -------------------- TOP BAR -------------------- */
+.top-bar {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.top-bar .logo-small img {
+  width: 92px;
+}
+
+.top-bar .search-box {
+  margin-left: 24px;
+  width: 640px;
+}
+
+/* -------------------- NAV TABS -------------------- */
+.tabs {
+  display: flex;
+  gap: 24px;
+  padding: 12px 180px;
+  font-size: 13px;
+}
+
+.tabs a {
+  color: var(--text-muted);
+  text-decoration: none;
+  padding-bottom: 8px;
+}
+
+.tabs a.active {
+  color: var(--link);
+  border-bottom: 3px solid var(--link);
+}
+
+/* -------------------- RESULTS -------------------- */
+.results {
+  padding: 20px 180px;
+}
+
+.result {
+  margin-bottom: 28px;
+}
+
+.result-url {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.result-title {
+  font-size: 20px;
+  color: var(--link);
+  text-decoration: none;
+}
+
+.result-title:hover {
+  text-decoration: underline;
+}
+
+.result-snippet {
+  font-size: 14px;
+  color: var(--text-main);
+  margin-top: 4px;
+  line-height: 1.6;
+}
+
+/* -------------------- VISITED -------------------- */
+.result-title:visited {
+  color: var(--link-visited);
+}
+
+/* -------------------- PAGINATION -------------------- */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 40px 0;
+}
+
+.pagination a {
+  color: var(--link);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.pagination a:hover {
+  text-decoration: underline;
+}
+
+/* ==================================================
+   FOOTER
+================================================== */
+.footer {
+  background: #f2f2f2;
+  border-top: 1px solid var(--border);
+  padding: 12px 180px;
+  font-size: 14px;
+}
+
+.footer-top {
+  color: var(--text-muted);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.footer-bottom {
+  display: flex;
+  gap: 24px;
+  padding-top: 8px;
+}
+
+.footer a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+/* ==================================================
+   RESPONSIVE
+================================================== */
+@media (max-width: 1024px) {
+  .search-box {
+    width: 90%;
+  }
+  .tabs,
+  .results,
+  .footer {
+    padding-left: 24px;
+    padding-right: 24px;
