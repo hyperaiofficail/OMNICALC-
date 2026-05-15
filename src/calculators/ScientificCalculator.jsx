@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { evaluate, format } from 'mathjs';
 
+const MATH_SYMBOLS_MAP = {
+    'π': 'pi',
+    'e': 'e',
+    '×': '*',
+    '÷': '/',
+    '√': 'sqrt',
+    'ln(': 'log(',
+    'log(': 'log10('
+};
+const MATH_SYMBOLS_REGEX = /π|e|×|÷|√|ln\(|log\(/g;
+
 export const ScientificCalculator = ({ initialData }) => {
   const [expression, setExpression] = useState(initialData?.expression || "0");
   const [isRadians, setIsRadians] = useState(true);
@@ -24,20 +35,10 @@ export const ScientificCalculator = ({ initialData }) => {
   const del = () => setExpression(prev => prev.length > 1 ? prev.slice(0, -1) : "0");
 
   const calculate = () => {
-    let raw = expression;
-
-    // Replace visual symbols for mathjs
-    raw = raw.replace(/π/g, 'pi');
-    raw = raw.replace(/e/g, 'e');
-    raw = raw.replace(/×/g, '*');
-    raw = raw.replace(/÷/g, '/');
-    raw = raw.replace(/√/g, 'sqrt');
-
-    // Handle functions
+    // Replace visual symbols and functions for mathjs
     // Note: mathjs 'log' is natural log (ln). 'log10' is base 10.
     // Our UI buttons insert 'ln(' and 'log('
-    raw = raw.replace(/ln\(/g, 'log(');
-    raw = raw.replace(/log\(/g, 'log10(');
+    const raw = expression.replace(MATH_SYMBOLS_REGEX, match => MATH_SYMBOLS_MAP[match]);
 
     try {
         // We override trig functions in the scope to handle degrees if needed.
