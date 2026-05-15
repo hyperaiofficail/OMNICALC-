@@ -22,25 +22,34 @@ export const parseIntent = async (input) => {
   for (const calc of calculators) {
     let score = 0;
 
+    // Cache lowercased strings on the calculator object to avoid recreating them
+    if (!calc._lowerName) {
+      calc._lowerName = calc.name.toLowerCase();
+      calc._nameWords = calc._lowerName.split(' ').filter(w => w.length >= 2);
+      if (calc.tags) calc._lowerTags = calc.tags.map(t => t.toLowerCase());
+      if (calc.description) calc._lowerDesc = calc.description.toLowerCase();
+    }
+
+    const lowerName = calc._lowerName;
+
     // Name Match
-    const lowerName = calc.name.toLowerCase();
     if (lower.includes(lowerName)) {
         score += 20;
     } else {
         // Partial Name Match (e.g. "BMI" from "BMI Calculator")
-        const nameWords = lowerName.split(' ');
+        const nameWords = calc._nameWords;
         let matches = 0;
         nameWords.forEach(word => {
-            if (word.length >= 2 && lower.includes(word)) matches++;
+            if (lower.includes(word)) matches++;
         });
         if (matches > 0) score += matches * 5;
     }
 
     // Tag Match
-    if (calc.tags && calc.tags.some(tag => lower.includes(tag.toLowerCase()))) score += 10;
+    if (calc._lowerTags && calc._lowerTags.some(tag => lower.includes(tag))) score += 10;
 
     // Description Match
-    if (calc.description && lower.includes(calc.description.toLowerCase())) score += 5;
+    if (calc._lowerDesc && lower.includes(calc._lowerDesc)) score += 5;
 
     if (score > maxScore) {
       maxScore = score;
